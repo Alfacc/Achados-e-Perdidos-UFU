@@ -1,0 +1,191 @@
+:root {
+    --bg: #f5f6f8;
+    --card: #fff;
+    --text: #1d2433;
+    --muted: #667085;
+    --primary: #1f6feb;
+    --danger: #c62828;
+    --border: #dfe3ea;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+a {
+    color: var(--primary);
+}
+
+/* ---------- Topo ---------- */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand {
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--text);
+}
+
+/* ---------- Layout ---------- */
+.container {
+    max-width: 760px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.narrow {
+    max-width: 460px;
+    margin: 0 auto;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.between {
+    justify-content: space-between;
+}
+
+/* ---------- Formulários ---------- */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+input,
+select,
+textarea {
+    font: inherit;
+    font-weight: 400;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: -1px;
+}
+
+/* ---------- Botões ---------- */
+.btn {
+    display: inline-block;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    background: var(--primary);
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+/* ---------- Mensagens e textos ---------- */
+.error {
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+/* ---------- Requisitos da senha ---------- */
+.rules {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    display: grid;
+    gap: 2px;
+}
+
+.rules li.ok {
+    color: #1e7e34;
+}
+
+/* ---------- Lista de objetos ---------- */
+.list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.tag {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.tag-lost {
+    background: #fdecea;
+    color: var(--danger);
+}
+
+.tag-found {
+    background: #e6f4ea;
+    color: #1e7e34;
+}
+
+.thumb {
+    max-width: 160px;
+    border-radius: 8px;
+}

@@ -1,18 +1,53 @@
-# Achados e Perdidos da UFU
+# Achados e Perdidos UFU
 
-Uma plataforma web desenvolvida para centralizar a busca e o registro de objetos perdidos ou encontrados na comunidade acadêmica da Universidade Federal de Uberlândia (UFU). O sistema facilita a comunicação entre quem perdeu um item e quem o encontrou, agilizando o processo de devolução em todos os campi da universidade.
+Vue 3 (Vite) + Django REST Framework + SQLite.
 
-## Tecnologias Utilizadas
+## Sprint 1
+- **SCRUM-10** – Cadastro e login com e-mail UFU
+- **SCRUM-12** – Cadastrar objeto perdido
 
-* **Front-end:** Vue.js
-* **Back-end:** Django (Python)
-* **Banco de Dados:** SQLite
+## Como rodar
 
-## Autores
+### Back-end (terminal 1)
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser # opcional, para usar /admin
+python manage.py runserver       # http://localhost:8000
+```
 
-* Davi Ferreira Ribeiro
-* Giovane Pereira
-* Leonardo Henrique Lemos Silva
-* Maycon Fernandes de Oliveira
-* Hugo Vieira
-* Marco Túlio Costa Rezende
+### Front-end (terminal 2)
+```bash
+cd frontend
+npm install
+npm run dev                      # http://localhost:5173
+```
+
+### Testes do back-end
+```bash
+cd backend
+python manage.py test
+```
+
+## Endpoints
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/api/auth/register/` | Cadastro (apenas e-mail UFU) |
+| POST | `/api/auth/login/` | Login → `access`, `refresh`, `user` |
+| POST | `/api/auth/token/refresh/` | Renova o access token |
+| GET | `/api/auth/me/` | Usuário logado |
+| GET | `/api/categories/` | Lista de categorias |
+| GET/POST | `/api/items/` | Lista / cadastra objeto (`multipart/form-data`) |
+
+## Configurações úteis (`backend/config/settings.py`)
+- `ALLOWED_EMAIL_DOMAINS`: domínios aceitos no cadastro (hoje `ufu.br`, aceitando subdomínios).
+- `MAX_PHOTO_MB`: tamanho máximo da foto.
+- Para testar sem e-mail UFU em desenvolvimento, adicione temporariamente `"gmail.com"` à lista.
+
+## Próximas histórias
+O modelo `Item` já tem `type` (`LOST`/`FOUND`), `status` (`OPEN`/`RESOLVED`) e `category`,
+então SCRUM-11, 13, 14 e 17 reaproveitam o que existe.

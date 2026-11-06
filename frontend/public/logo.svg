@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+    <title>Achados e Perdidos UFU</title>
+    <line x1="116" y1="116" x2="150" y2="150" stroke="#f5b301" stroke-width="14" stroke-linecap="round"/>
+    <circle cx="72" cy="72" r="58" fill="#ffffff" stroke="#0c2469" stroke-width="9"/>
+    <g transform="translate(25.5 25.5) scale(0.0725)">
+        <path fill="#0c2469" d="M284 195V875L405 996H683L839 840V417L898 357H1157L1206 405H922L890 438V866L551 1206H405L74 875V405Z M405 73H874L1109 308H874L787 395V823L735 875H456L405 823Z M948 454H1205V875L874 1206H620L939 887V464Z"/>
+    </g>
+</svg>
