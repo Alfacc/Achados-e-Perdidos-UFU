@@ -39,6 +39,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Login por e-mail (case-insensitive) devolvendo também os dados do usuário."""
 
+    default_error_messages = {
+        "no_active_account": "E-mail ou senha incorretos.",
+    }
+
     def validate(self, attrs):
         attrs["email"] = attrs["email"].strip().lower()
         data = super().validate(attrs)

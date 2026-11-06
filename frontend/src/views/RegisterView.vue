@@ -29,7 +29,7 @@ async function submit() {
     return;
   }
   if (!passwordOk.value) {
-    errors.value = { password: "A senha não atende aos requisitos abaixo." };
+    errors.value = { password: "A senha não atende aos requisitos acima." };
     return;
   }
   loading.value = true;
