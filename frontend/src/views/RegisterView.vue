@@ -8,10 +8,25 @@ import AuthLayout from "../components/AuthLayout.vue";
 const auth = useAuthStore();
 const router = useRouter();
 
+// Mesmos domínios aceitos no back-end (ALLOWED_EMAIL_DOMAINS em settings.py).
+const ALLOWED_DOMAINS = ["ufu.br"];
+const EMAIL_DOMAIN_MESSAGE = "Use seu e-mail institucional da UFU (@ufu.br).";
+
+function isUfuEmail(email) {
+  const domain = email.trim().toLowerCase().split("@").pop();
+  return ALLOWED_DOMAINS.some((d) => domain === d || domain.endsWith("." + d));
+}
+
 const form = reactive({ name: "", email: "", password: "", confirm: "" });
 const errors = ref({});
 const message = ref("");
 const loading = ref(false);
+const emailTouched = ref(false);
+
+const emailError = computed(() => {
+  if (!emailTouched.value || !form.email) return "";
+  return isUfuEmail(form.email) ? "" : EMAIL_DOMAIN_MESSAGE;
+});
 
 const rules = computed(() => [
   { label: "Pelo menos 8 caracteres", ok: form.password.length >= 8 },
@@ -24,6 +39,11 @@ const passwordOk = computed(() => rules.value.every((r) => r.ok));
 async function submit() {
   errors.value = {};
   message.value = "";
+  if (!isUfuEmail(form.email)) {
+    emailTouched.value = true;
+    errors.value = { email: EMAIL_DOMAIN_MESSAGE };
+    return;
+  }
   if (form.password !== form.confirm) {
     errors.value = { confirm: "As senhas não conferem." };
     return;
@@ -56,8 +76,15 @@ async function submit() {
           <small v-if="errors.name" class="error">{{ errors.name }}</small>
         </label>
         <label>E-mail UFU
-          <input v-model="form.email" type="email" placeholder="voce@ufu.br" required autocomplete="email" />
-          <small v-if="errors.email" class="error">{{ errors.email }}</small>
+          <input
+            v-model="form.email"
+            type="email"
+            placeholder="voce@ufu.br"
+            required
+            autocomplete="email"
+            @blur="emailTouched = true"
+          />
+          <small v-if="errors.email || emailError" class="error">{{ errors.email || emailError }}</small>
         </label>
         <label>Senha
           <input v-model="form.password" type="password" required autocomplete="new-password" />
