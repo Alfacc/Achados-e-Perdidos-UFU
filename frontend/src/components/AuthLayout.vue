@@ -17,6 +17,10 @@ import AuthTabs from "./AuthTabs.vue";
 
         <div class="auth-side">
             <div class="auth-box">
+                <div class="mobile-brand">
+                    <img src="/logo.svg" alt="" />
+                    <span>Achados e Perdidos UFU</span>
+                </div>
                 <h2 class="auth-title">Crie uma conta ou faça login</h2>
                 <AuthTabs />
                 <slot />
@@ -27,9 +31,8 @@ import AuthTabs from "./AuthTabs.vue";
 
 <style scoped>
 .auth-page {
-    position: fixed;
-    inset: 0;
-    z-index: 10;
+    min-height: 100vh;
+    min-height: 100dvh;
     display: grid;
     grid-template-columns: 1fr 520px;
     background: var(--bg);
@@ -37,6 +40,10 @@ import AuthTabs from "./AuthTabs.vue";
 
 /* ---------- Lado esquerdo ---------- */
 .auth-hero {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     align-items: center;
     padding: 48px;
@@ -72,14 +79,17 @@ import AuthTabs from "./AuthTabs.vue";
 .auth-side {
     display: flex;
     align-items: flex-start;
-    padding: clamp(24px, 28vh, 280px) 24px 24px;
-    overflow-y: auto;
+    padding: clamp(24px, 20vh, 220px) 24px 24px;
 }
 
 .auth-box {
     width: 100%;
     max-width: 420px;
     margin: 0 auto;
+}
+
+.mobile-brand {
+    display: none;
 }
 
 .auth-title {
@@ -105,6 +115,25 @@ import AuthTabs from "./AuthTabs.vue";
 
     .auth-hero {
         display: none;
+    }
+
+    .auth-side {
+        padding-top: 32px;
+    }
+
+    .mobile-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 24px;
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+
+    .mobile-brand img {
+        width: 40px;
+        height: 40px;
     }
 }
 </style>

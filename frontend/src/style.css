@@ -25,6 +25,9 @@ a {
 
 /* ---------- Topo ---------- */
 .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -130,6 +133,11 @@ textarea:focus {
     background: transparent;
     color: var(--text);
     border: 1px solid var(--border);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 14px;
 }
 
 /* ---------- Mensagens e textos ---------- */
