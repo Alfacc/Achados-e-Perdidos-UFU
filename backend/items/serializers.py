@@ -22,6 +22,15 @@ class ItemSerializer(serializers.ModelSerializer):
             "location", "date_occurred", "photo", "status", "owner_name", "created_at",
         )
         read_only_fields = ("id", "status", "owner_name", "category_name", "created_at")
+        extra_kwargs = {
+            "category": {
+                "error_messages": {
+                    "does_not_exist": "Selecione uma categoria válida.",
+                    "incorrect_type": "Selecione uma categoria válida.",
+                    "null": "Selecione uma categoria.",
+                }
+            },
+        }
 
     def validate_date_occurred(self, value):
         if value > timezone.localdate():

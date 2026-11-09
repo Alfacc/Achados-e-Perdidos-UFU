@@ -44,11 +44,56 @@ class ItemCreateTests(APITestCase):
         res = self.client.post("/api/items/", {**self.data, "date_occurred": "2999-01-01"}, format="json")
         self.assertEqual(res.status_code, 400)
 
-    def test_create_with_photo_multipart(self):
+    def test_blank_title_rejected(self):
         self.client.force_authenticate(self.user)
+        res = self.client.post("/api/items/", {**self.data, "title": "   "}, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("title", res.data)
+
+    def test_invalid_category_has_friendly_message(self):
+        self.client.force_authenticate(self.user)
+        res = self.client.post("/api/items/", {**self.data, "category": 9999}, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.data["category"], ["Selecione uma categoria válida."])
+
+    def test_description_too_long_rejected(self):
+        self.client.force_authenticate(self.user)
+        res = self.client.post("/api/items/", {**self.data, "description": "x" * 1001}, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("description", res.data)
+
+    def test_client_cannot_forge_status_or_owner(self):
+        other = User.objects.create_user("bia@ufu.br", "SenhaForte#2026", name="Bia")
+        self.client.force_authenticate(self.user)
+        res = self.client.post(
+            "/api/items/", {**self.data, "status": "RESOLVED", "owner": other.id}, format="json"
+        )
+        self.assertEqual(res.status_code, 201)
+        item = Item.objects.get()
+        self.assertEqual(item.status, "OPEN")
+        self.assertEqual(item.owner, self.user)
+
+    def test_non_image_photo_rejected(self):
+        self.client.force_authenticate(self.user)
+        txt = SimpleUploadedFile("nota.txt", b"nao sou imagem", content_type="text/plain")
+        res = self.client.post("/api/items/", {**self.data, "photo": txt}, format="multipart")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("photo", res.data)
+
+    @override_settings(MAX_PHOTO_MB=0)
+    def test_photo_over_size_limit_rejected(self):
+        self.client.force_authenticate(self.user)
+        res = self.client.post("/api/items/", {**self.data, "photo": self._gif()}, format="multipart")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("photo", res.data)
+
+    def _gif(self):
         gif = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,"
                b"\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
-        photo = SimpleUploadedFile("foto.gif", gif, content_type="image/gif")
-        res = self.client.post("/api/items/", {**self.data, "photo": photo}, format="multipart")
+        return SimpleUploadedFile("foto.gif", gif, content_type="image/gif")
+
+    def test_create_with_photo_multipart(self):
+        self.client.force_authenticate(self.user)
+        res = self.client.post("/api/items/", {**self.data, "photo": self._gif()}, format="multipart")
         self.assertEqual(res.status_code, 201, res.data)
         self.assertTrue(res.data["photo"])
