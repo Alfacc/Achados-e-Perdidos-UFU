@@ -26,7 +26,6 @@ class ItemSerializer(serializers.ModelSerializer):
             "category": {
                 "error_messages": {
                     "does_not_exist": "Selecione uma categoria válida.",
-                    "incorrect_type": "Selecione uma categoria válida.",
                     "null": "Selecione uma categoria.",
                 }
             },
