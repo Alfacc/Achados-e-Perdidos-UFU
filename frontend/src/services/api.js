@@ -26,19 +26,35 @@ api.interceptors.request.use((config) => {
 });
 
 // Se o access token expirar, tenta renovar uma vez com o refresh token.
+// Várias requisições podem receber 401 ao mesmo tempo: todas aguardam o mesmo refresh.
+let refreshing = null;
+
+function refreshAccessToken() {
+  refreshing ??= axios
+    .post(`${API_URL}/auth/token/refresh/`, { refresh: tokenStorage.refresh })
+    .then(({ data }) => {
+      tokenStorage.set({ access: data.access, refresh: data.refresh });
+      return data.access;
+    })
+    .finally(() => {
+      refreshing = null;
+    });
+  return refreshing;
+}
+
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
     const isAuthCall = original?.url?.includes("/auth/login/") || original?.url?.includes("/auth/token/refresh/");
-    if (error.response?.status === 401 && !original._retry && !isAuthCall && tokenStorage.refresh) {
+    if (error.response?.status === 401 && original && !original._retry && !isAuthCall && tokenStorage.refresh) {
       original._retry = true;
       try {
-        const { data } = await axios.post(`${API_URL}/auth/token/refresh/`, { refresh: tokenStorage.refresh });
-        tokenStorage.set({ access: data.access, refresh: data.refresh });
-        original.headers.Authorization = `Bearer ${data.access}`;
+        const access = await refreshAccessToken();
+        original.headers.Authorization = `Bearer ${access}`;
         return api(original);
       } catch {
+        // Sessão expirada: limpa tudo e volta para o login (o reload também zera o Pinia).
         tokenStorage.clear();
         window.location.assign("/login");
       }

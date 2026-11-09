@@ -9,6 +9,13 @@ const auth = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 
+// Só aceita caminhos internos ("/algo"), nunca "//site.com" ou URLs absolutas.
+function safeRedirect(target) {
+  return typeof target === "string" && target.startsWith("/") && !target.startsWith("//")
+    ? target
+    : { name: "home" };
+}
+
 const form = reactive({ email: "", password: "" });
 const error = ref("");
 const loading = ref(false);
@@ -18,7 +25,7 @@ async function submit() {
   loading.value = true;
   try {
     await auth.login(form.email, form.password);
-    router.push(route.query.redirect || { name: "home" });
+    router.push(safeRedirect(route.query.redirect));
   } catch (e) {
     error.value = parseApiError(e).message;
   } finally {

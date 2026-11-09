@@ -12,6 +12,7 @@ const router = createRouter({
     { path: "/login", name: "login", component: LoginView, meta: { guestOnly: true } },
     { path: "/cadastro", name: "register", component: RegisterView, meta: { guestOnly: true } },
     { path: "/objetos/perdi", name: "item-lost", component: ItemCreateView, meta: { requiresAuth: true } },
+    { path: "/:pathMatch(.*)*", redirect: { name: "home" } },
   ],
 });
 
