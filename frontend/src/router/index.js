@@ -3,7 +3,6 @@ import { useAuthStore } from "../stores/auth";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import RegisterView from "../views/RegisterView.vue";
-import ItemCreateView from "../views/ItemCreateView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,7 +10,6 @@ const router = createRouter({
     { path: "/", name: "home", component: HomeView, meta: { requiresAuth: true } },
     { path: "/login", name: "login", component: LoginView, meta: { guestOnly: true } },
     { path: "/cadastro", name: "register", component: RegisterView, meta: { guestOnly: true } },
-    { path: "/objetos/perdi", name: "item-lost", component: ItemCreateView, meta: { requiresAuth: true } },
     { path: "/:pathMatch(.*)*", redirect: { name: "home" } },
   ],
 });

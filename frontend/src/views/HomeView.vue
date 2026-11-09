@@ -1,17 +1,21 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import api from "../services/api";
 import { parseApiError } from "../utils/errors";
-
-const route = useRoute();
-const router = useRouter();
+import ItemCreateModal from "../components/ItemCreateModal.vue";
 
 const items = ref([]);
 const loading = ref(true);
 const error = ref("");
-// Aviso exibido ao voltar do cadastro de objeto perdido.
-const created = ref(route.query.cadastrado === "1");
+const showCreate = ref(false);
+const created = ref(false);
+
+// O objeto recém-criado entra no topo da lista na hora, sem buscar tudo de novo.
+function onCreated(item) {
+  items.value.unshift(item);
+  showCreate.value = false;
+  created.value = true;
+}
 
 // "2026-11-03" -> "03/11/2026" (sem passar por Date, para não sofrer com fuso horário).
 function formatDate(iso) {
@@ -31,10 +35,7 @@ async function loadItems() {
   }
 }
 
-onMounted(() => {
-  if (created.value) router.replace({ query: {} });
-  loadItems();
-});
+onMounted(loadItems);
 </script>
 
 <template>
@@ -44,7 +45,7 @@ onMounted(() => {
         <h1>Objetos cadastrados</h1>
         <p class="muted">Itens perdidos e encontrados no campus.</p>
       </div>
-      <RouterLink to="/objetos/perdi" class="btn">+ Perdi um objeto</RouterLink>
+      <button type="button" class="btn" @click="showCreate = true">+ Perdi um objeto</button>
     </div>
 
     <p v-if="created" class="notice" role="status">
@@ -62,7 +63,7 @@ onMounted(() => {
     <div v-else-if="!items.length" class="card empty">
       <p><strong>Nenhum objeto cadastrado ainda.</strong></p>
       <p class="muted">Perdeu alguma coisa? Cadastre e aumente as chances de alguém encontrar.</p>
-      <RouterLink to="/objetos/perdi" class="btn btn-sm">Cadastrar objeto perdido</RouterLink>
+      <button type="button" class="btn btn-sm" @click="showCreate = true">Cadastrar objeto perdido</button>
     </div>
 
     <ul v-else class="list">
@@ -90,6 +91,8 @@ onMounted(() => {
         </div>
       </li>
     </ul>
+
+    <ItemCreateModal v-if="showCreate" @created="onCreated" @close="showCreate = false" />
   </section>
 </template>
 

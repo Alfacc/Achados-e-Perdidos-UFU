@@ -107,7 +107,8 @@ backend/
   items/      categorias e objetos (Item), com as categorias iniciais criadas via migration
   config/     settings e rotas
 frontend/src/
-  views/      Login, Cadastro, Home (lista) e cadastro de objeto perdido
+  views/      Login, Cadastro e Home (lista de objetos)
+  components/ modal de cadastro de objeto perdido e layout das telas de acesso
   services/   cliente Axios com renovação automática do token
   stores/     estado de autenticação (Pinia)
 ```
