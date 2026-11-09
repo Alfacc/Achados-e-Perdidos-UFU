@@ -96,10 +96,6 @@ a {
     align-items: center;
 }
 
-.between {
-    justify-content: space-between;
-}
-
 /* ---------- Formulários ---------- */
 form {
     display: flex;
@@ -293,6 +289,9 @@ textarea:focus {
 }
 
 .notice {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: var(--success-soft);
     color: var(--success);
     padding: 8px 12px;

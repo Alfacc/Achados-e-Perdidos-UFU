@@ -7,7 +7,6 @@ import { parseApiError } from "../utils/errors";
 // Mesmos limites do back-end (models.Item e settings.MAX_PHOTO_MB).
 const MAX_DESCRIPTION = 1000;
 const MAX_PHOTO_MB = 5;
-const FORM_FIELDS = ["title", "category", "description", "location", "date_occurred", "photo"];
 
 // Data de hoje no fuso do navegador. toISOString() usa UTC e, depois das 21h
 // em Brasília, já devolveria o dia seguinte (que o back-end recusa como futuro).
@@ -22,7 +21,6 @@ const today = localToday();
 
 const categories = ref([]);
 const categoriesError = ref("");
-const loadingCategories = ref(false);
 const form = reactive({ title: "", description: "", category: "", location: "", date_occurred: today });
 const photo = ref(null);
 const photoPreview = ref("");
@@ -32,14 +30,11 @@ const loading = ref(false);
 
 async function loadCategories() {
   categoriesError.value = "";
-  loadingCategories.value = true;
   try {
     const { data } = await api.get("/categories/");
     categories.value = data;
   } catch (e) {
     categoriesError.value = parseApiError(e).message;
-  } finally {
-    loadingCategories.value = false;
   }
 }
 
@@ -54,23 +49,14 @@ onBeforeUnmount(() => setPreview(null));
 
 function onFile(event) {
   const file = event.target.files[0] || null;
-  const { photo: _, ...rest } = errors.value;
-  errors.value = rest;
+  let error = "";
+  if (file && !file.type.startsWith("image/")) error = "Escolha um arquivo de imagem (JPG, PNG...).";
+  else if (file && file.size > MAX_PHOTO_MB * 1024 * 1024) error = `A foto deve ter no máximo ${MAX_PHOTO_MB} MB.`;
 
-  if (file && !file.type.startsWith("image/")) {
-    errors.value = { ...errors.value, photo: "Escolha um arquivo de imagem (JPG, PNG...)." };
-  } else if (file && file.size > MAX_PHOTO_MB * 1024 * 1024) {
-    errors.value = { ...errors.value, photo: `A foto deve ter no máximo ${MAX_PHOTO_MB} MB.` };
-  }
-
-  if (errors.value.photo) {
-    event.target.value = "";
-    photo.value = null;
-    setPreview(null);
-    return;
-  }
-  photo.value = file;
-  setPreview(file);
+  if (error) event.target.value = "";
+  errors.value = { ...errors.value, photo: error };
+  photo.value = error ? null : file;
+  setPreview(photo.value);
 }
 
 async function submit() {
@@ -85,13 +71,9 @@ async function submit() {
     await api.post("/items/", body);
     router.push({ name: "home", query: { cadastrado: "1" } });
   } catch (e) {
-    const { fields, message: general } = parseApiError(e);
-    // Erros de campos que não aparecem no formulário (ex.: "type") vão para a mensagem geral.
-    const hidden = Object.entries(fields).filter(([k]) => !FORM_FIELDS.includes(k));
-    errors.value = Object.fromEntries(Object.entries(fields).filter(([k]) => FORM_FIELDS.includes(k)));
-    message.value = hidden.length && !Object.keys(errors.value).length
-      ? hidden.map(([, v]) => v).join(" ")
-      : general;
+    const parsed = parseApiError(e);
+    errors.value = parsed.fields;
+    message.value = parsed.message;
   } finally {
     loading.value = false;
   }
@@ -108,8 +90,8 @@ async function submit() {
         <small v-if="errors.title" class="error">{{ errors.title }}</small>
       </label>
       <label>Categoria
-        <select v-model="form.category" :aria-invalid="!!errors.category" :disabled="loadingCategories || !!categoriesError" required>
-          <option value="" disabled>{{ loadingCategories ? "Carregando..." : "Selecione..." }}</option>
+        <select v-model="form.category" :aria-invalid="!!errors.category" :disabled="!categories.length" required>
+          <option value="" disabled>Selecione...</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
         <small v-if="categoriesError" class="error">

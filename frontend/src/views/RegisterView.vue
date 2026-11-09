@@ -40,8 +40,7 @@ async function submit() {
   errors.value = {};
   message.value = "";
   if (!isUfuEmail(form.email)) {
-    emailTouched.value = true;
-    errors.value = { email: EMAIL_DOMAIN_MESSAGE };
+    emailTouched.value = true; // exibe emailError
     return;
   }
   if (form.password !== form.confirm) {

@@ -110,12 +110,6 @@ onMounted(() => {
     margin: 0;
 }
 
-.notice {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .notice-close {
     background: none;
     border: 0;
