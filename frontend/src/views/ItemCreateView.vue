@@ -1,15 +1,28 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import api from "../services/api";
 import { parseApiError } from "../utils/errors";
 
+// Mesmos limites do back-end (models.Item e settings.MAX_PHOTO_MB).
+const MAX_DESCRIPTION = 1000;
+const MAX_PHOTO_MB = 5;
+
+// Data de hoje no fuso do navegador. toISOString() usa UTC e, depois das 21h
+// em Brasília, já devolveria o dia seguinte (que o back-end recusa como futuro).
+function localToday() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 const router = useRouter();
-const today = new Date().toISOString().slice(0, 10);
+const today = localToday();
 
 const categories = ref([]);
 const form = reactive({ title: "", description: "", category: "", location: "", date_occurred: today });
 const photo = ref(null);
+const photoPreview = ref("");
 const errors = ref({});
 const message = ref("");
 const loading = ref(false);
@@ -19,8 +32,32 @@ onMounted(async () => {
   categories.value = data;
 });
 
+function setPreview(file) {
+  if (photoPreview.value) URL.revokeObjectURL(photoPreview.value);
+  photoPreview.value = file ? URL.createObjectURL(file) : "";
+}
+
+onBeforeUnmount(() => setPreview(null));
+
 function onFile(event) {
-  photo.value = event.target.files[0] || null;
+  const file = event.target.files[0] || null;
+  const { photo: _, ...rest } = errors.value;
+  errors.value = rest;
+
+  if (file && !file.type.startsWith("image/")) {
+    errors.value = { ...errors.value, photo: "Escolha um arquivo de imagem (JPG, PNG...)." };
+  } else if (file && file.size > MAX_PHOTO_MB * 1024 * 1024) {
+    errors.value = { ...errors.value, photo: `A foto deve ter no máximo ${MAX_PHOTO_MB} MB.` };
+  }
+
+  if (errors.value.photo) {
+    event.target.value = "";
+    photo.value = null;
+    setPreview(null);
+    return;
+  }
+  photo.value = file;
+  setPreview(file);
 }
 
 async function submit() {
@@ -60,7 +97,14 @@ async function submit() {
         <small v-if="errors.category" class="error">{{ errors.category }}</small>
       </label>
       <label>Descrição
-        <textarea v-model="form.description" rows="4" placeholder="Cor, marca, características..." required />
+        <textarea
+          v-model="form.description"
+          rows="4"
+          :maxlength="MAX_DESCRIPTION"
+          placeholder="Cor, marca, características..."
+          required
+        />
+        <small class="muted counter">{{ form.description.length }}/{{ MAX_DESCRIPTION }}</small>
         <small v-if="errors.description" class="error">{{ errors.description }}</small>
       </label>
       <label>Onde perdeu?
@@ -71,8 +115,9 @@ async function submit() {
         <input v-model="form.date_occurred" type="date" :max="today" required />
         <small v-if="errors.date_occurred" class="error">{{ errors.date_occurred }}</small>
       </label>
-      <label>Foto (opcional)
+      <label>Foto (opcional, até {{ MAX_PHOTO_MB }} MB)
         <input type="file" accept="image/*" @change="onFile" />
+        <img v-if="photoPreview" :src="photoPreview" alt="Prévia da foto" class="thumb" />
         <small v-if="errors.photo" class="error">{{ errors.photo }}</small>
       </label>
       <p v-if="message && !Object.keys(errors).length" class="error">{{ message }}</p>

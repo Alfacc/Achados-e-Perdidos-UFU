@@ -189,3 +189,9 @@ textarea:focus {
     max-width: 160px;
     border-radius: 8px;
 }
+/* ---------- Formulário de objeto ---------- */
+.counter {
+    font-size: 12px;
+    font-weight: 400;
+    text-align: right;
+}
