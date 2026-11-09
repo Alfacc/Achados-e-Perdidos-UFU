@@ -72,13 +72,14 @@ async function submit() {
       <h1>Criar conta</h1>
       <form @submit.prevent="submit">
         <label>Nome
-          <input v-model="form.name" required autocomplete="name" />
+          <input v-model="form.name" :aria-invalid="!!errors.name" required autocomplete="name" />
           <small v-if="errors.name" class="error">{{ errors.name }}</small>
         </label>
         <label>E-mail UFU
           <input
             v-model="form.email"
             type="email"
+            :aria-invalid="!!(errors.email || emailError)"
             placeholder="voce@ufu.br"
             required
             autocomplete="email"
@@ -87,7 +88,7 @@ async function submit() {
           <small v-if="errors.email || emailError" class="error">{{ errors.email || emailError }}</small>
         </label>
         <label>Senha
-          <input v-model="form.password" type="password" required autocomplete="new-password" />
+          <input v-model="form.password" :aria-invalid="!!errors.password" type="password" required autocomplete="new-password" />
           <ul class="rules">
             <li v-for="r in rules" :key="r.label" :class="{ ok: r.ok }">
               {{ r.ok ? "✓" : "•" }} {{ r.label }}
@@ -96,7 +97,7 @@ async function submit() {
           <small v-if="errors.password" class="error">{{ errors.password }}</small>
         </label>
         <label>Confirmar senha
-          <input v-model="form.confirm" type="password" required autocomplete="new-password" />
+          <input v-model="form.confirm" :aria-invalid="!!errors.confirm" type="password" required autocomplete="new-password" />
           <small v-if="errors.confirm" class="error">{{ errors.confirm }}</small>
         </label>
         <p v-if="message && !Object.keys(errors).length" class="error">{{ message }}</p>

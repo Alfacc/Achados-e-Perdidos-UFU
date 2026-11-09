@@ -101,13 +101,14 @@ async function submit() {
 <template>
   <section class="card narrow">
     <h1>Cadastrar objeto perdido</h1>
+    <p class="muted subtitle">Quanto mais detalhes, maior a chance de alguém reconhecer o seu objeto.</p>
     <form @submit.prevent="submit">
       <label>O que você perdeu?
-        <input v-model="form.title" maxlength="120" placeholder="Ex.: Garrafa térmica azul" required />
+        <input v-model="form.title" :aria-invalid="!!errors.title" maxlength="120" placeholder="Ex.: Garrafa térmica azul" required />
         <small v-if="errors.title" class="error">{{ errors.title }}</small>
       </label>
       <label>Categoria
-        <select v-model="form.category" :disabled="loadingCategories || !!categoriesError" required>
+        <select v-model="form.category" :aria-invalid="!!errors.category" :disabled="loadingCategories || !!categoriesError" required>
           <option value="" disabled>{{ loadingCategories ? "Carregando..." : "Selecione..." }}</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
@@ -120,6 +121,7 @@ async function submit() {
       <label>Descrição
         <textarea
           v-model="form.description"
+          :aria-invalid="!!errors.description"
           rows="4"
           :maxlength="MAX_DESCRIPTION"
           placeholder="Cor, marca, características..."
@@ -129,23 +131,39 @@ async function submit() {
         <small v-if="errors.description" class="error">{{ errors.description }}</small>
       </label>
       <label>Onde perdeu?
-        <input v-model="form.location" maxlength="150" placeholder="Ex.: Bloco 1B, sala 101" required />
+        <input v-model="form.location" :aria-invalid="!!errors.location" maxlength="150" placeholder="Ex.: Bloco 1B, sala 101" required />
         <small v-if="errors.location" class="error">{{ errors.location }}</small>
       </label>
       <label>Quando perdeu?
-        <input v-model="form.date_occurred" type="date" :max="today" required />
+        <input v-model="form.date_occurred" :aria-invalid="!!errors.date_occurred" type="date" :max="today" required />
         <small v-if="errors.date_occurred" class="error">{{ errors.date_occurred }}</small>
       </label>
       <label>Foto (opcional, até {{ MAX_PHOTO_MB }} MB)
-        <input type="file" accept="image/*" @change="onFile" />
+        <input type="file" accept="image/*" :aria-invalid="!!errors.photo" @change="onFile" />
         <img v-if="photoPreview" :src="photoPreview" alt="Prévia da foto" class="thumb" />
         <small v-if="errors.photo" class="error">{{ errors.photo }}</small>
       </label>
       <p v-if="message" class="error" role="alert">{{ message }}</p>
-      <div class="row">
+      <div class="row actions">
         <RouterLink to="/" class="btn btn-ghost">Cancelar</RouterLink>
         <button class="btn" :disabled="loading || !!categoriesError">{{ loading ? "Salvando..." : "Cadastrar" }}</button>
       </div>
     </form>
   </section>
 </template>
+
+<style scoped>
+h1 {
+    margin: 0 0 4px;
+}
+
+.subtitle {
+    margin: 0 0 20px;
+    font-size: 14px;
+}
+
+.actions {
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+</style>

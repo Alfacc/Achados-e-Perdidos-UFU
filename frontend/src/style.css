@@ -4,8 +4,14 @@
     --text: #1d2433;
     --muted: #667085;
     --primary: #1f6feb;
+    --primary-hover: #1a5fd0;
+    --primary-soft: #e8f0fe;
+    --success: #1e7e34;
+    --success-soft: #e6f4ea;
     --danger: #c62828;
     --border: #dfe3ea;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+    --shadow-hover: 0 4px 12px rgba(16, 24, 40, 0.08);
 }
 
 * {
@@ -17,6 +23,13 @@ body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+    font-size: 1.6rem;
+    line-height: 1.2;
 }
 
 a {
@@ -58,8 +71,18 @@ a {
 .card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 20px;
+    box-shadow: var(--shadow);
+}
+
+.list .card {
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.list .card:hover {
+    border-color: #cfd6e1;
+    box-shadow: var(--shadow-hover);
 }
 
 .narrow {
@@ -98,8 +121,36 @@ textarea {
     font: inherit;
     font-weight: 400;
     padding: 9px 10px;
+    color: var(--text);
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
+    transition: border-color 0.15s;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+    border-color: #c4ccd8;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input[type="file"] {
+    padding: 8px;
+    background: var(--bg);
+}
+
+[aria-invalid="true"] {
+    border-color: var(--danger);
+}
+
+input:disabled,
+select:disabled {
+    background: var(--bg);
+    cursor: not-allowed;
 }
 
 input:focus,
@@ -122,17 +173,38 @@ textarea:focus {
     border-radius: 8px;
     padding: 10px 16px;
     cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.05s;
+}
+
+.btn:hover:not(:disabled) {
+    background: var(--primary-hover);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.btn:focus-visible,
+.link-btn:focus-visible,
+.brand:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .btn:disabled {
     opacity: 0.6;
-    cursor: wait;
+    cursor: not-allowed;
 }
 
 .btn-ghost {
     background: transparent;
     color: var(--text);
     border: 1px solid var(--border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+    background: var(--bg);
+    border-color: #c4ccd8;
 }
 
 .btn-sm {
@@ -165,7 +237,7 @@ textarea:focus {
 }
 
 .rules li.ok {
-    color: #1e7e34;
+    color: var(--success);
 }
 
 /* ---------- Lista de objetos ---------- */
@@ -189,14 +261,20 @@ textarea:focus {
 }
 
 .tag-found {
-    background: #e6f4ea;
-    color: #1e7e34;
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.tag-resolved {
+    background: var(--primary-soft);
+    color: var(--primary);
 }
 
 .thumb {
     max-width: 160px;
     border-radius: 8px;
 }
+
 /* ---------- Formulário de objeto ---------- */
 .counter {
     font-size: 12px;
@@ -215,8 +293,8 @@ textarea:focus {
 }
 
 .notice {
-    background: #e6f4ea;
-    color: #1e7e34;
+    background: var(--success-soft);
+    color: var(--success);
     padding: 8px 12px;
     border-radius: 8px;
 }
