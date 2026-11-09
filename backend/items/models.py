@@ -27,7 +27,7 @@ class Item(models.Model):
 
     type = models.CharField(max_length=5, choices=Type.choices)
     title = models.CharField("título", max_length=120)
-    description = models.TextField("descrição")
+    description = models.TextField("descrição", max_length=1000)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="items")
     location = models.CharField("local", max_length=150)
     date_occurred = models.DateField("data em que perdeu/encontrou")
