@@ -16,6 +16,7 @@ Repositório, escolha das tecnologias, definição do sistema e backlog.
   - SCRUM-24: serializer e endpoint (POST) do objeto perdido
   - SCRUM-25: interface do formulário "Perdi um objeto"
   - SCRUM-26: conexão do formulário com a API via Axios e tratamento de erros
+- **Cadastrar objeto encontrado**: botão "Encontrei um objeto" na página inicial, usando o mesmo formulário (modal) do objeto perdido com `type=FOUND`
 
 ### Backlog
 | Ticket | História |
@@ -27,8 +28,8 @@ Repositório, escolha das tecnologias, definição do sistema e backlog.
 | SCRUM-17 | Marcar um objeto perdido/encontrado como devolvido |
 | SCRUM-18 | Ser notificado se um objeto parecido com o que perdi for encontrado |
 
-O modelo `Item` já tem `type` (`LOST`/`FOUND`), `status` (`OPEN`/`RESOLVED`) e `category`,
-que servem de base para o cadastro de objeto encontrado e para as SCRUM-13, 14 e 17.
+O modelo `Item` tem `type` (`LOST`/`FOUND`), `status` (`OPEN`/`RESOLVED`) e `category`,
+usados pelos cadastros de objeto perdido e encontrado e que servem de base para as SCRUM-13, 14 e 17.
 
 ## Como rodar
 
@@ -85,7 +86,7 @@ Rotas marcadas com 🔒 exigem o cabeçalho `Authorization: Bearer <access token
 
 **Objeto**
 - Título com até 120 caracteres, local com até 150 e descrição com até 1000.
-- A data em que o objeto foi perdido não pode estar no futuro.
+- A data em que o objeto foi perdido/encontrado não pode estar no futuro.
 - Foto opcional, apenas imagem, com até `MAX_PHOTO_MB` (5 MB).
 - `owner` e `status` são definidos pelo servidor (usuário logado e `OPEN`) e não podem ser enviados pelo cliente.
 
@@ -108,7 +109,7 @@ backend/
   config/     settings e rotas
 frontend/src/
   views/      Login, Cadastro e Home (lista de objetos)
-  components/ modal de cadastro de objeto perdido e layout das telas de acesso
+  components/ modal de cadastro de objeto (perdido ou encontrado) e layout das telas de acesso
   services/   cliente Axios com renovação automática do token
   stores/     estado de autenticação (Pinia)
 ```

@@ -39,6 +39,22 @@ class ItemCreateTests(APITestCase):
         self.assertEqual(item.owner, self.user)
         self.assertEqual(item.status, "OPEN")
 
+    def test_create_found_item(self):
+        self.client.force_authenticate(self.user)
+        res = self.client.post("/api/items/", {**self.data, "type": "FOUND"}, format="json")
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.data["type"], "FOUND")
+        item = Item.objects.get()
+        self.assertEqual(item.type, "FOUND")
+        self.assertEqual(item.owner, self.user)
+        self.assertEqual(item.status, "OPEN")
+
+    def test_invalid_type_rejected(self):
+        self.client.force_authenticate(self.user)
+        res = self.client.post("/api/items/", {**self.data, "type": "STOLEN"}, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("type", res.data)
+
     def test_future_date_rejected(self):
         self.client.force_authenticate(self.user)
         res = self.client.post("/api/items/", {**self.data, "date_occurred": "2999-01-01"}, format="json")

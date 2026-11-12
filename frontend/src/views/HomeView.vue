@@ -7,13 +7,13 @@ import ItemCreateModal from "../components/ItemCreateModal.vue";
 const items = ref([]);
 const loading = ref(true);
 const error = ref("");
-const showCreate = ref(false);
+const createType = ref(null); // null (fechado), "LOST" ou "FOUND"
 const created = ref(false);
 
 // O objeto recém-criado entra no topo da lista na hora, sem buscar tudo de novo.
 function onCreated(item) {
   items.value.unshift(item);
-  showCreate.value = false;
+  createType.value = null;
   created.value = true;
 }
 
@@ -45,7 +45,10 @@ onMounted(loadItems);
         <h1>Objetos cadastrados</h1>
         <p class="muted">Itens perdidos e encontrados no campus.</p>
       </div>
-      <button type="button" class="btn" @click="showCreate = true">+ Perdi um objeto</button>
+      <div class="header-actions">
+        <button type="button" class="btn" @click="createType = 'LOST'">+ Perdi um objeto</button>
+        <button type="button" class="btn" @click="createType = 'FOUND'">+ Encontrei um objeto</button>
+      </div>
     </div>
 
     <p v-if="created" class="notice" role="status">
@@ -62,8 +65,11 @@ onMounted(loadItems);
 
     <div v-else-if="!items.length" class="card empty">
       <p><strong>Nenhum objeto cadastrado ainda.</strong></p>
-      <p class="muted">Perdeu alguma coisa? Cadastre e aumente as chances de alguém encontrar.</p>
-      <button type="button" class="btn btn-sm" @click="showCreate = true">Cadastrar objeto perdido</button>
+      <p class="muted">Perdeu ou achou alguma coisa? Cadastre e ajude o objeto a voltar para o dono.</p>
+      <div class="empty-actions">
+        <button type="button" class="btn btn-sm" @click="createType = 'LOST'">Cadastrar objeto perdido</button>
+        <button type="button" class="btn btn-sm" @click="createType = 'FOUND'">Cadastrar objeto encontrado</button>
+      </div>
     </div>
 
     <ul v-else class="list">
@@ -92,7 +98,13 @@ onMounted(loadItems);
       </li>
     </ul>
 
-    <ItemCreateModal v-if="showCreate" @created="onCreated" @close="showCreate = false" />
+    <ItemCreateModal
+      v-if="createType"
+      :key="createType"
+      :type="createType"
+      @created="onCreated"
+      @close="createType = null"
+    />
   </section>
 </template>
 
@@ -111,6 +123,17 @@ onMounted(loadItems);
 
 .page-header p {
     margin: 0;
+}
+
+.header-actions,
+.empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.empty-actions {
+    justify-content: center;
 }
 
 .notice-close {
@@ -207,6 +230,10 @@ onMounted(loadItems);
     .page-header {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .header-actions .btn {
+        flex: 1;
     }
 
     .item {
