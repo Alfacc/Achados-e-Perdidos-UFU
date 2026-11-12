@@ -16,7 +16,31 @@ function localToday() {
 }
 
 // Modal aberto pela Home: avisa o objeto criado ("created") para entrar na lista sem recarregar.
+// O mesmo formulário serve para as duas histórias: "LOST" (perdi) e "FOUND" (encontrei).
+const props = defineProps({
+  type: { type: String, default: "LOST", validator: (v) => ["LOST", "FOUND"].includes(v) },
+});
 const emit = defineEmits(["created", "close"]);
+
+const TEXTS = {
+  LOST: {
+    heading: "Cadastrar objeto perdido",
+    subtitle: "Quanto mais detalhes, maior a chance de alguém reconhecer o seu objeto.",
+    title: "O que você perdeu?",
+    titlePlaceholder: "Ex.: Garrafa térmica azul",
+    location: "Onde perdeu?",
+    date: "Quando perdeu?",
+  },
+  FOUND: {
+    heading: "Cadastrar objeto encontrado",
+    subtitle: "Descreva o objeto e onde ele foi encontrado para o dono conseguir reconhecê-lo.",
+    title: "O que você encontrou?",
+    titlePlaceholder: "Ex.: Carteira preta",
+    location: "Onde encontrou?",
+    date: "Quando encontrou?",
+  },
+};
+const t = TEXTS[props.type];
 const dialog = ref(null);
 const today = localToday();
 
@@ -78,7 +102,7 @@ async function submit() {
   loading.value = true;
   try {
     const body = new FormData();
-    body.append("type", "LOST"); // SCRUM-12: objeto perdido
+    body.append("type", props.type);
     Object.entries(form).forEach(([k, v]) => body.append(k, v));
     if (photo.value) body.append("photo", photo.value);
     const { data } = await api.post("/items/", body);
@@ -104,11 +128,11 @@ async function submit() {
   >
     <div class="modal-body">
       <button type="button" class="modal-close" aria-label="Fechar" :disabled="loading" @click="dialog.close()">×</button>
-      <h1 id="item-modal-title">Cadastrar objeto perdido</h1>
-      <p class="muted subtitle">Quanto mais detalhes, maior a chance de alguém reconhecer o seu objeto.</p>
+      <h1 id="item-modal-title">{{ t.heading }}</h1>
+      <p class="muted subtitle">{{ t.subtitle }}</p>
       <form @submit.prevent="submit">
-        <label>O que você perdeu?
-          <input v-model="form.title" :aria-invalid="!!errors.title" maxlength="120" placeholder="Ex.: Garrafa térmica azul" required />
+        <label>{{ t.title }}
+          <input v-model="form.title" :aria-invalid="!!errors.title" maxlength="120" :placeholder="t.titlePlaceholder" required />
           <small v-if="errors.title" class="error">{{ errors.title }}</small>
         </label>
         <label>Categoria
@@ -134,11 +158,11 @@ async function submit() {
           <small class="muted counter">{{ form.description.length }}/{{ MAX_DESCRIPTION }}</small>
           <small v-if="errors.description" class="error">{{ errors.description }}</small>
         </label>
-        <label>Onde perdeu?
+        <label>{{ t.location }}
           <input v-model="form.location" :aria-invalid="!!errors.location" maxlength="150" placeholder="Ex.: Bloco 1B, sala 101" required />
           <small v-if="errors.location" class="error">{{ errors.location }}</small>
         </label>
-        <label>Quando perdeu?
+        <label>{{ t.date }}
           <input v-model="form.date_occurred" :aria-invalid="!!errors.date_occurred" type="date" :max="today" required />
           <small v-if="errors.date_occurred" class="error">{{ errors.date_occurred }}</small>
         </label>
